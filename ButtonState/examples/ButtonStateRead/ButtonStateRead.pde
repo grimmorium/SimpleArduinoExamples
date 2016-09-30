@@ -1,71 +1,62 @@
+/*
+  ButtonState.h - Library for reading the state of buttons.
+  Created by Martin P. Pawlowski for simplearduinoexamples.com, September 30, 2016.
+  Released into the public domain.
+  developed on Arduino 1.6.0
+  
+  Schema and description on www.simplearduinoexamples.com/Buttons
+*/
+
+
 #include <ButtonState.h>
 
 //button
 const int buttonPin = 2; 
-ButtonState but1(buttonPin, 50, 250, 2000, 3000, 150);
+ButtonState but1(buttonPin);
 
-//button state led
-const int ledPin =  13; 
-
-//button push type leds
-const int ledPinWAS_LONG_PRESSED =  4; 
-const int ledPinWAS_SHORT_PRESSED =  5; 
-
-int ledPinWAS_LONG_PRESSEDState;
-int ledPinWAS_SHORT_PRESSEDState;
+//LEDs
+const int ledWasPressed = 5 ; 
+const int ledIsPressed = 6; 
+const int ledWasReleased = 7; 
+const int ledLongPressed = 8; 
+const int ledShortPressed = 9; 
 
 void setup()
 {
-  pinMode(ledPin, OUTPUT); 
-  pinMode(ledPinWAS_LONG_PRESSED, OUTPUT); 
-  pinMode(ledPinWAS_SHORT_PRESSED, OUTPUT); 
-  
-  int ledPinWAS_LONG_PRESSEDState = 0;
-  int ledPinWAS_SHORT_PRESSEDState = 0;
-  
+  pinMode(ledWasPressed, OUTPUT); 
+  pinMode(ledIsPressed, OUTPUT); 
+  pinMode(ledWasReleased, OUTPUT); 
+  pinMode(ledLongPressed, OUTPUT); 
+  pinMode(ledShortPressed, OUTPUT); 
+
   but1.Init();
 }
 
 void loop()
 {
   but1.CheckButton();
+  digitalWrite(ledWasPressed, LOW);
+  digitalWrite(ledIsPressed, LOW);
+  digitalWrite(ledWasReleased, LOW);
+  digitalWrite(ledLongPressed, LOW);
+  digitalWrite(ledShortPressed, LOW);
   
-  if(but1.GetButtonState() == ButtonState::IS_PRESSED)
-  {
-   digitalWrite(ledPin, HIGH);  
+  if(but1.WasPressed()){
+    digitalWrite(ledWasPressed, HIGH);
   }
-  if(but1.GetButtonState() == ButtonState::IS_NOT_PRESSED)
-  {
-   digitalWrite(ledPin, LOW);  
+  if(but1.WasReleased()){
+    digitalWrite(ledWasReleased, HIGH);
+  }
+  if(but1.IsPressed()){
+    digitalWrite(ledIsPressed, HIGH);
   }
   
-  if(but1.GetButtonPushType() == ButtonState::WAS_LONG_PRESSED)
-  {
-    if(ledPinWAS_LONG_PRESSEDState == 0)
-    {
-      digitalWrite(ledPinWAS_LONG_PRESSED, HIGH);
-      ledPinWAS_LONG_PRESSEDState = 1;
-    }
-    else
-    {
-      digitalWrite(ledPinWAS_LONG_PRESSED, LOW);
-      ledPinWAS_LONG_PRESSEDState = 0;
-    }
+  if(but1.WasReleased() && but1.PushType() == but1.LONG_PRESSED){
+    digitalWrite(ledLongPressed, HIGH);
   }
-
-  if(but1.GetButtonPushType() == ButtonState::WAS_SHORT_PRESSED)
-  {
-    if(ledPinWAS_SHORT_PRESSEDState == 0)
-    {
-      digitalWrite(ledPinWAS_SHORT_PRESSED, HIGH); 
-      ledPinWAS_SHORT_PRESSEDState = 1;
-    }
-    else
-    {
-      digitalWrite(ledPinWAS_SHORT_PRESSED, LOW); 
-      ledPinWAS_SHORT_PRESSEDState = 0;
-    }
+  if(but1.WasReleased() && but1.PushType() == but1.SHORT_PRESSED){
+    digitalWrite(ledShortPressed, HIGH);
   }
-
-
+  
+  delay(80);
 }
